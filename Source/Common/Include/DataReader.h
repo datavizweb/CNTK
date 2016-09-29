@@ -204,6 +204,7 @@ public:
         return false;
     };
 
+    // old DataReader architecture
     virtual bool IsLegacyReader() const
     {
         return true;
@@ -387,6 +388,7 @@ public:
     virtual void StartMinibatchLoop(size_t mbSize, size_t epoch, size_t requestedEpochSamples = requestDataSize);
 
     virtual bool SupportsDistributedMBRead() const override;
+    virtual bool IsLegacyReader() const override;
     virtual void StartDistributedMinibatchLoop(size_t mbSize, size_t epoch, size_t subsetNum, size_t numSubsets, size_t requestedEpochSamples = requestDataSize) override;
 
     virtual void StartMinibatchLoop(size_t mbSize, size_t epoch, const std::unordered_set<InputStreamDescription>&, size_t requestedEpochSamples = requestDataSize) override;
