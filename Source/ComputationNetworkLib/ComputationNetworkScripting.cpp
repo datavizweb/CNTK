@@ -522,6 +522,7 @@ public:
 
         // determine all leaves and their dependents
         dependentSet = set<ComputationNodeBasePtr>(inputNodes.begin(), inputNodes.end()); // start with the specified inputs
+        auto skippedSetNodes = set<ComputationNodeBasePtr>();
         // determine all leaves and their dependents
         for (let& node : allInputs)
         {
@@ -533,6 +534,20 @@ public:
                 for (let& input : node->GetInputs())
                     if (dependentSet.find(input) != dependentSet.end())
                         dependentSet.insert(node);
+                    else
+                    {
+                        // This is needed to handle PastValueNode properly
+                        // dependentSet will not contain their input, since the PastValueNode is traversed prior to their input
+                        skippedSetNodes.insert(node);
+                    }
+        }
+
+        // Iterate over skipped nodes once again in case their input was added after traversing these nodes
+        for (let& node : skippedSetNodes)
+        {
+            for (let& input : node->GetInputs())
+                if (dependentSet.find(input) != dependentSet.end())
+                    dependentSet.insert(node);
         }
 
 #if 0
