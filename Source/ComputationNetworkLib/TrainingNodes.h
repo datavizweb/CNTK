@@ -258,6 +258,8 @@ public:
         }
         else
         {
+            // Resize m_lefDivRight as it has not been done before.
+            m_leftDivRight->Resize(InputRef(1).Value());
             BackpropToRight(*m_leftDivRight, InputRef(0).ValueFor(fr), InputRef(1).ValueFor(fr), InputRef(1).GradientFor(fr), Gradient());
         }
     }
@@ -286,7 +288,6 @@ public:
     virtual void UpdateFunctionMBSize() override
     {
         m_logOfRight->Resize(InputRef(1).Value());
-        m_leftDivRight->Resize(InputRef(1).Value());
     }
 
     // -sum(left_i * log(right_i))
@@ -315,7 +316,10 @@ public:
         {
             auto node = dynamic_pointer_cast<CrossEntropyNode<ElemType>>(nodeP);
             node->m_logOfRight->SetValue(*m_logOfRight);
-            node->m_leftDivRight->SetValue(*m_leftDivRight);
+            if (m_leftDivRight != NULL)
+            {
+                node->m_leftDivRight->SetValue(*m_leftDivRight);
+            }
         }
     }
 
@@ -324,14 +328,12 @@ public:
     {
         Base::RequestMatricesBeforeForwardProp(matrixPool);
         RequestMatrixFromPool(m_logOfRight, matrixPool);
-        RequestMatrixFromPool(m_leftDivRight, matrixPool);
     }
 
     // request matrices that are needed for gradient computation
     virtual void RequestMatricesBeforeBackprop(MatrixPool& matrixPool)
     {
         Base::RequestMatricesBeforeBackprop(matrixPool);
-        RequestMatrixFromPool(m_logOfRight, matrixPool);
         RequestMatrixFromPool(m_leftDivRight, matrixPool);
     }
 
